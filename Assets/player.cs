@@ -20,7 +20,16 @@ public class player : MonoBehaviour
     void Update()
     {
         LeerMovimiento();
+        LeerPickup();
         ActualizarAnim();
+    }
+
+    void LeerPickup()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            anim.SetTrigger("pickup");
+        }
     }
 
     void LeerMovimiento()
