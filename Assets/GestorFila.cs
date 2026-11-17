@@ -86,17 +86,24 @@ public class GestorFila : MonoBehaviour
     {
         turnoEnCurso = true;
         n.MostrarBocadillo(true);
+        n.MostrarAnimo(true);
 
         tiempoRestante = duracionTurno;
         while (tiempoRestante > 0f)
         {
             tiempoRestante -= Time.deltaTime;
+
+            // progreso es un porcentaje a partir del cual actualizar animo calcula el sprite necesario
+            float progreso = 1f - tiempoRestante / duracionTurno;
+            n.ActualizarAnimo(progreso);
+
             yield return null;
         }
         tiempoRestante = 0f;
 
-        // Se acaba el turno: se va por la salida y desaparece al llegar
-        n.MostrarBocadillo(false);
+        // Se acaba el turno: cara final dentro de su bocadillo, se va por la salida y desaparece al llegar
+        n.AnimoFinal();
+        n.BocadilloFinal();
         fila.Remove(n);
         n.IrA(salida.position, () => Destroy(n.gameObject));
 
