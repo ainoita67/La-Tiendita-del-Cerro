@@ -5,20 +5,20 @@ using UnityEngine;
 public class GestorFila : MonoBehaviour
 {
     [Header("NPCs")] // Organizacion en el menú de Unity
-    public npc prefabNpc;                              // el prefab NPC
+    public npc prefabNpc;                              
     public AnimatorOverrideController[] personajes;    // los .overrideController de los NPCs
     public int cantidadInicial = 4;
     public float esperaEntreApariciones = 1f;          // para que no salgan todos a la vez
 
     [Header("Puntos de la escena")]
-    public Transform entrada;      // borde por donde aparecen (detrás del último puesto)
-    public Transform salida;       // borde por donde se van (delante del primer puesto)
-    public Transform[] puestos;    // puestos[0] = el primero de la fila
+    public Transform entrada;      
+    public Transform salida;       
+    public Transform[] puestos;    
 
     [Header("Turno")]
     public float duracionTurno = 60f;
 
-    public float tiempoRestante { get; private set; }
+    public float tiempoRestante { get; private set; } //visible puublicamente, solo se puede aignar desde aqui, por eso no se ve en el inspector unity
 
     List<npc> fila = new List<npc>();
     List<AnimatorOverrideController> disponibles = new List<AnimatorOverrideController>();
@@ -30,7 +30,7 @@ public class GestorFila : MonoBehaviour
         disponibles.AddRange(personajes);
         Barajar(disponibles);
 
-        StartCoroutine(CrearFilaInicial());
+        StartCoroutine(CrearFilaInicial()); //ejecuta crarfilainicial que es una corrutina (funcion que se puede pausar y continuar)
     }
 
     IEnumerator CrearFilaInicial()
@@ -43,19 +43,20 @@ public class GestorFila : MonoBehaviour
         }
     }
 
-    // Crea un NPC en la entrada y lo manda al último puesto libre
+    // Crea un NPC en la entrada y lo manda al último puesto libre. Lo hace una vez porque esta dentro del bucle en CrearFilaInicial()
     bool AnnadirNpc()
     {
-        if (disponibles.Count == 0 || fila.Count >= puestos.Length) return false;
-
+        // tienen que quedar disponibles en la lista de overrides. Tiene que haber menos npcs en la fila que el total de puestos disponibles.
+        if (disponibles.Count == 0 || fila.Count >= puestos.Length) return false; 
+        // Se selecciona el siguiente override y se quita de la lista
         AnimatorOverrideController personaje = disponibles[0];
         disponibles.RemoveAt(0);
 
         // X e Y de la entrada, pero la Z que tenga guardada el prefab
         Vector3 posicion = new Vector3(entrada.position.x, entrada.position.y, prefabNpc.transform.position.z);
-        npc nuevo = Instantiate(prefabNpc, posicion, Quaternion.identity);
-        nuevo.name = "NPC_" + personaje.name;
-        nuevo.PonerPersonaje(personaje);
+        npc nuevo = Instantiate(prefabNpc, posicion, Quaternion.identity); //llamada al awake() del prefav
+        nuevo.name = "NPC_" + personaje.name; //para el hierarchy
+        nuevo.PonerPersonaje(personaje); //metodo de npc, cambiadr el override
 
         fila.Add(nuevo);
         MandarASuPuesto(nuevo);
@@ -66,18 +67,21 @@ public class GestorFila : MonoBehaviour
     {
         int puesto = fila.IndexOf(n);
         n.IrA(puestos[puesto].position, () => AlLlegarAlPuesto(n));
+        // irA tiene un parametro para indicar que metodo ejecutar cuando termina lo suyo
     }
 
     // Se llama cada vez que un NPC llega a su puesto
     void AlLlegarAlPuesto(npc n)
     {
-        // Solo empieza turno si es el primero de la fila y no hay otro turno en marcha
+        // empieza turno si es el primero de la fila y no hay otro turno en marcha
+        // dialogo
         if (fila.Count > 0 && fila[0] == n && !turnoEnCurso)
         {
-            StartCoroutine(Turno(n));
+            StartCoroutine(Turno(n)); // ejecuta turno que es una corrutina
         }
     }
 
+    // esto es solo para el primero de la fila (cuando habla)
     IEnumerator Turno(npc n)
     {
         turnoEnCurso = true;
@@ -105,7 +109,8 @@ public class GestorFila : MonoBehaviour
         }
     }
 
-    void Barajar<T>(List<T> lista)
+    // Algoritmo "Fisher-Yates". Recorre lista desce atras e intercambia 1 por 1 con otro al azar.
+    void Barajar<T>(List<T> lista) //lista de cualquier tipo no solo personajes.
     {
         for (int i = lista.Count - 1; i > 0; i--)
         {
