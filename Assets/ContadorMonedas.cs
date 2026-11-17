@@ -25,17 +25,10 @@ public class ContadorMonedas : MonoBehaviour
         ActualizarTexto();
     }
 
-    // Devuelve true si había monedas suficientes y las gasta; false si no
-    public bool Gastar(int cantidad)
+    public void Gastar(int cantidad)
     {
-        if (monedas < cantidad)
-        {
-            return false;
-        }
-
         monedas -= cantidad;
         ActualizarTexto();
-        return true;
     }
 
     void ActualizarTexto()
@@ -46,9 +39,4 @@ public class ContadorMonedas : MonoBehaviour
         }
     }
 
-    // Para que al cambiar el número en el Inspector se vea también en el texto
-    void OnValidate()
-    {
-        ActualizarTexto();
-    }
 }
