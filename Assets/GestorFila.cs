@@ -18,6 +18,9 @@ public class GestorFila : MonoBehaviour
     [Header("Turno")]
     public float duracionTurno = 60f;
 
+    [Header("Pedidos")]
+    public Item[] itemsPosibles;   // los items que pueden pedir los aldeanos
+
     public float tiempoRestante { get; private set; } //visible puublicamente, solo se puede aignar desde aqui, por eso no se ve en el inspector unity
 
     List<npc> fila = new List<npc>();
@@ -58,6 +61,10 @@ public class GestorFila : MonoBehaviour
         nuevo.name = "NPC_" + personaje.name; //para el hierarchy
         nuevo.PonerPersonaje(personaje); //metodo de npc, cambiadr el override
 
+        // Cada aldeano llega ya sabiendo lo que quiere
+        nuevo.pedido = GenerarPedido();
+        Debug.Log(nuevo.name + " quiere " + nuevo.pedido);
+
         fila.Add(nuevo);
         MandarASuPuesto(nuevo);
         return true;
@@ -86,6 +93,7 @@ public class GestorFila : MonoBehaviour
     {
         turnoEnCurso = true;
         n.MostrarBocadillo(true);
+        n.MostrarPedido();
         n.MostrarAnimo(true);
 
         tiempoRestante = duracionTurno;
@@ -114,6 +122,22 @@ public class GestorFila : MonoBehaviour
         {
             MandarASuPuesto(otro);
         }
+    }
+
+    // Elige un item al azar de los posibles y una cantidad al azar dentro de su rango
+    Pedido GenerarPedido()
+    {
+        if (itemsPosibles == null || itemsPosibles.Length == 0)
+        {
+            Debug.LogWarning("GestorFila: no hay items en 'Items Posibles', el NPC no tendrá pedido");
+            return null;
+        }
+
+        Item item = itemsPosibles[Random.Range(0, itemsPosibles.Length)];
+        // Con números enteros, Random.Range NO incluye el máximo, por eso el +1
+        int cantidad = Random.Range(item.cantidadMinima, item.cantidadMaxima + 1);
+
+        return new Pedido(item, cantidad);
     }
 
     // Algoritmo "Fisher-Yates". Recorre lista desce atras e intercambia 1 por 1 con otro al azar.

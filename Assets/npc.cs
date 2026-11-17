@@ -1,10 +1,20 @@
 using System;
 using UnityEngine;
+using TMPro;
 
 public class npc : MonoBehaviour
 {
     public float velocidad = 2f;
     public GameObject bocadillo;   // hijo con el cuadro de diálogo (se oculta al empezar)
+
+    // Lo que quiere este aldeano. Lo asigna el GestorFila al crearlo.
+    // Se ve en el Inspector al darle a Play.
+    public Pedido pedido;
+
+    [Header("Pedido en el bocadillo")]
+    public GameObject contenedorPedido;   // hijo del bocadillo que agrupa icono + texto
+    public SpriteRenderer iconoPedido;    // icono del item
+    public TMP_Text cantidadPedido;          // cantidad, ej: "x3"
 
     [Header("Bocadillo al terminar el turno")]
     public Sprite spriteBocadilloFinal;          // dialog box (el pequeño, solo para el emote)
@@ -35,6 +45,12 @@ public class npc : MonoBehaviour
     {
         if (bocadillo == null) return;
 
+        // En el bocadillo pequeño solo va el emote, el pedido se quita
+        if (contenedorPedido != null)
+        {
+            contenedorPedido.SetActive(false);
+        }
+
         Vector3 pos = bocadillo.transform.localPosition;
         pos.x = posXBocadilloFinal;
         pos.z += fondoZFinal;
@@ -52,6 +68,31 @@ public class npc : MonoBehaviour
         if (sr != null && spriteBocadilloFinal != null)
         {
             sr.sprite = spriteBocadilloFinal;
+        }
+    }
+
+    // Rellena el icono y la cantidad del pedido dentro del bocadillo
+    public void MostrarPedido()
+    {
+        if (contenedorPedido == null) return;
+
+        // Sin pedido no hay nada que enseñar
+        if (pedido == null || pedido.item == null)
+        {
+            contenedorPedido.SetActive(false);
+            return;
+        }
+
+        contenedorPedido.SetActive(true);
+
+        if (iconoPedido != null)
+        {
+            iconoPedido.sprite = pedido.item.icono;
+        }
+
+        if (cantidadPedido != null)
+        {
+            cantidadPedido.text = "x" + pedido.cantidad;
         }
     }
 
