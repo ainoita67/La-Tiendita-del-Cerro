@@ -15,6 +15,7 @@ public class npc : MonoBehaviour
     public GameObject contenedorPedido;   // hijo del bocadillo que agrupa icono + texto
     public SpriteRenderer iconoPedido;    // icono del item
     public TMP_Text cantidadPedido;          // cantidad, ej: "x3"
+    public TMP_Text precioPedido;          // cantidad, ej: "x3"
 
     [Header("Bocadillo al terminar el turno")]
     public Sprite spriteBocadilloFinal;          // dialog box (el pequeño, solo para el emote)
@@ -83,6 +84,8 @@ public class npc : MonoBehaviour
             return;
         }
 
+        int total = pedido.cantidad * pedido.item.precio;
+
         contenedorPedido.SetActive(true);
 
         if (iconoPedido != null)
@@ -93,6 +96,11 @@ public class npc : MonoBehaviour
         if (cantidadPedido != null)
         {
             cantidadPedido.text = "x" + pedido.cantidad;
+        }
+
+        if (precioPedido != null)
+        {
+            precioPedido.text = "x" + total;
         }
     }
 

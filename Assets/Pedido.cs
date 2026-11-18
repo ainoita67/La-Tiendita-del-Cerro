@@ -13,6 +13,12 @@ public class Pedido
         this.cantidad = cantidad;
     }
 
+    // Lo que vale el pedido entero: precio por unidad x cantidad
+    public int PrecioTotal()
+    {
+        return item.precio * cantidad;
+    }
+
     public override string ToString()
     {
         return cantidad + " x " + item.nombre;

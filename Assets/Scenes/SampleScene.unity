@@ -6817,7 +6817,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45495cf843061498086d198d4df3fd23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  monedas: -1
+  monedas: 400
   texto: {fileID: 624679165}
 --- !u!1 &519420028
 GameObject:
@@ -9842,7 +9842,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: -1
+  m_text: 400
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e114dbe83984940cdbeefb8d84035039, type: 2}
   m_sharedMaterial: {fileID: -2261749222974031493, guid: e114dbe83984940cdbeefb8d84035039, type: 2}
@@ -10369,7 +10369,7 @@ MonoBehaviour:
   - {fileID: 1071564631}
   - {fileID: 2132472068}
   - {fileID: 649791492}
-  duracionTurno: 20
+  duracionTurno: 10
   itemsPosibles:
   - {fileID: 11400000, guid: 2d0f05e8d024cdea0a0989b4a3f44a1f, type: 2}
 --- !u!4 &1298995635

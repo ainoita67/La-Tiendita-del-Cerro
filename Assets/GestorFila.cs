@@ -63,7 +63,6 @@ public class GestorFila : MonoBehaviour
 
         // Cada aldeano llega ya sabiendo lo que quiere
         nuevo.pedido = GenerarPedido();
-        Debug.Log(nuevo.name + " quiere " + nuevo.pedido);
 
         fila.Add(nuevo);
         MandarASuPuesto(nuevo);
@@ -109,6 +108,9 @@ public class GestorFila : MonoBehaviour
         }
         tiempoRestante = 0f;
 
+        // No le han atendido a tiempo: se pierde la mitad de lo que valía el pedido
+        CobrarPenalizacion(n);
+
         // Se acaba el turno: cara final dentro de su bocadillo, se va por la salida y desaparece al llegar
         n.AnimoFinal();
         n.BocadilloFinal();
@@ -124,12 +126,20 @@ public class GestorFila : MonoBehaviour
         }
     }
 
+    // Resta de las monedas la mitad del precio total del pedido (redondeando hacia abajo)
+    void CobrarPenalizacion(npc n)
+    {
+        if (n.pedido == null || n.pedido.item == null || ContadorMonedas.instancia == null) return;
+
+        int penalizacion = Mathf.FloorToInt(n.pedido.PrecioTotal() / 2f);
+        ContadorMonedas.instancia.Gastar(penalizacion);
+    }
+
     // Elige un item al azar de los posibles y una cantidad al azar dentro de su rango
     Pedido GenerarPedido()
     {
         if (itemsPosibles == null || itemsPosibles.Length == 0)
         {
-            Debug.LogWarning("GestorFila: no hay items en 'Items Posibles', el NPC no tendrá pedido");
             return null;
         }
 
