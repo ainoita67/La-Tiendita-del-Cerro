@@ -292,7 +292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 711ad24a0cfe76eeaac159930e399259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidad: 2
+  velocidad: 4
   bocadillo: {fileID: 3391425802462371852}
   pedido:
     item: {fileID: 0}

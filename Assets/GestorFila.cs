@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class GestorFila : MonoBehaviour
 {
+    // Para poder usarlo desde cualquier script: GestorFila.instancia.EmpezarDia();
+    public static GestorFila instancia;
+
+    void Awake()
+    {
+        instancia = this;
+    }
+
     [Header("NPCs")] // Organizacion en el menú de Unity
     public npc prefabNpc;                              
     public AnimatorOverrideController[] personajes;    // los .overrideController de los NPCs
@@ -27,9 +35,15 @@ public class GestorFila : MonoBehaviour
     List<AnimatorOverrideController> disponibles = new List<AnimatorOverrideController>();
     bool turnoEnCurso = false;
 
-    void Start()
+    // Para saber cuándo se acaba el día
+    int npcsEnEscena = 0;          // creados y todavía no destruidos (incluye los que se están yendo)
+    bool creandoFila = false;      // true mientras siguen apareciendo NPCs
+
+    // Lo llama el GestorDias al empezar cada día.
+    public void EmpezarDia()
     {
-        // Copia los personajes y los desordena para sacarlos al azar sin repetir
+        // Cada día se vuelven a barajar todos los personajes
+        disponibles.Clear();
         disponibles.AddRange(personajes);
         Barajar(disponibles);
 
@@ -38,11 +52,26 @@ public class GestorFila : MonoBehaviour
 
     IEnumerator CrearFilaInicial()
     {
+        creandoFila = true;
         int cuantos = Mathf.Min(cantidadInicial, puestos.Length);
         for (int i = 0; i < cuantos; i++)
         {
             if (!AnnadirNpc()) break;
             yield return new WaitForSeconds(esperaEntreApariciones);
+        }
+        creandoFila = false;
+    }
+
+    // Se llama cuando un NPC llega a la salida
+    void AlSalirNpc(npc n)
+    {
+        Destroy(n.gameObject);
+        npcsEnEscena--;
+
+        // Era el último del día: no queda nadie y no van a salir más
+        if (npcsEnEscena == 0 && !creandoFila)
+        {
+            GestorDias.instancia.TerminarDia();
         }
     }
 
@@ -65,6 +94,7 @@ public class GestorFila : MonoBehaviour
         nuevo.pedido = GenerarPedido();
 
         fila.Add(nuevo);
+        npcsEnEscena++;
         MandarASuPuesto(nuevo);
         return true;
     }
@@ -115,7 +145,7 @@ public class GestorFila : MonoBehaviour
         n.AnimoFinal();
         n.BocadilloFinal();
         fila.Remove(n);
-        n.IrA(salida.position, () => Destroy(n.gameObject));
+        n.IrA(salida.position, () => AlSalirNpc(n));
 
         turnoEnCurso = false;
 
