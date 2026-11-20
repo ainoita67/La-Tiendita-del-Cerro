@@ -84,8 +84,6 @@ public class npc : MonoBehaviour
             return;
         }
 
-        int total = pedido.cantidad * pedido.item.precio;
-
         contenedorPedido.SetActive(true);
 
         if (iconoPedido != null)
@@ -95,12 +93,12 @@ public class npc : MonoBehaviour
 
         if (cantidadPedido != null)
         {
-            cantidadPedido.text = "x" + pedido.cantidad;
+            cantidadPedido.text = "x" + pedido.cantidadRestante;   // lo que falta por entregar
         }
 
         if (precioPedido != null)
         {
-            precioPedido.text = "x" + total;
+            precioPedido.text = "x" + pedido.total;
         }
     }
 

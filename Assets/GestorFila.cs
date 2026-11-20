@@ -156,6 +156,25 @@ public class GestorFila : MonoBehaviour
         }
     }
 
+    // El NPC que está hablando ahora mismo (null si no hay turno en marcha)
+    public npc NpcConTurno()
+    {
+        if (!turnoEnCurso || fila.Count == 0) return null;
+        return fila[0];
+    }
+
+    // La llama la ZonaEntrega: el jugador da 1 item al NPC que tiene el turno
+    public void EntregarItem()
+    {
+        npc n = NpcConTurno();
+        if (n == null || n.pedido == null) return;
+
+        if (n.pedido.RestarItem())
+        {
+            n.MostrarPedido();   // refresca el bocadillo
+        }
+    }
+
     // Resta de las monedas la mitad del precio total del pedido (redondeando hacia abajo)
     void CobrarPenalizacion(npc n)
     {

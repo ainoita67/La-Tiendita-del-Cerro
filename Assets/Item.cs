@@ -9,10 +9,8 @@ public class Item : ScriptableObject
     public string nombre; 
     public Sprite icono;
 
-    [Header("Pedidos")]
     public int cantidadMinima = 1;   // lo mínimo que puede pedir un aldeano
     public int cantidadMaxima = 5;   // lo máximo
 
-    [Header("Tienda")]
     public int precio = 1;           // monedas por unidad (aún no se usa)
 }
