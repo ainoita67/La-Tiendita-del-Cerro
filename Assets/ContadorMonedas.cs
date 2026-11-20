@@ -41,6 +41,12 @@ public class ContadorMonedas : MonoBehaviour
     {
         monedas -= cantidad;
         ActualizarTexto();
+
+        // Llegar a -1 es perder la partida
+        if (monedas < 0 && GestorDias.instancia != null)
+        {
+            GestorDias.instancia.PerderPartida();
+        }
         MostrarCambio("-" + cantidad, colorRestar);
     }
 

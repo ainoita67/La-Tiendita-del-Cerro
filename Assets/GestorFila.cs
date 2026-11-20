@@ -182,6 +182,10 @@ public class GestorFila : MonoBehaviour
     // La llama la ZonaEntrega: el jugador da 1 item al NPC que tiene el turno
     public void EntregarItem()
     {
+        // Con la partida perdida ya no se puede entregar nada
+        // Por si aparece tarde la pantalla para que no te deje corregir rapido y no perder
+        if (GestorDias.instancia != null && GestorDias.instancia.partidaPerdida) return;
+
         npc n = NpcConTurno();
         if (n == null || n.pedido == null) return;
 

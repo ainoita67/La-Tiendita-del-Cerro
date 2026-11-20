@@ -20,6 +20,9 @@ public class GestorDias : MonoBehaviour
 
     [Header("Fin de la partida")]
     public GameObject pantallaFin;     // (opcional) se enseña tras el último día
+    public GameObject pantallaSinMonedas;   // "Fin del juego, te has quedado sin monedas"
+
+    public bool partidaPerdida { get; private set; }
 
     public int diaActual { get; private set; }
 
@@ -36,7 +39,9 @@ public class GestorDias : MonoBehaviour
         Time.timeScale = 1f;   // por si venía bloqueado de antes
         if (pantallaNoche != null) pantallaNoche.SetActive(false);
         if (pantallaFin != null) pantallaFin.SetActive(false);
+        if (pantallaSinMonedas != null) pantallaSinMonedas.SetActive(false);
 
+        partidaPerdida = false;
         diaActual = 1;
         EmpezarDia();
     }
@@ -61,6 +66,9 @@ public class GestorDias : MonoBehaviour
             ContadorMonedas.instancia.Gastar(costeCena);
         }
 
+        // Si con la cena se ha quedado en negativo, ya se ha perdido: no sale la noche
+        if (partidaPerdida) yield break;
+
         // Pantalla de noche con el resumen del día
         if (textoDia != null) textoDia.text = "Termina el dia " + diaActual;
         if (textoMonedas != null && ContadorMonedas.instancia != null)
@@ -82,6 +90,19 @@ public class GestorDias : MonoBehaviour
         if (pantallaNoche != null) pantallaNoche.SetActive(false);
         diaActual++;
         EmpezarDia();
+    }
+
+    // La llama ContadorMonedas cuando las monedas bajan de 0
+    public void PerderPartida()
+    {
+        if (partidaPerdida) return;   // por si se llama dos veces
+        partidaPerdida = true;
+
+        if (pantallaNoche != null) pantallaNoche.SetActive(false);
+        if (pantallaSinMonedas != null) pantallaSinMonedas.SetActive(true);
+
+        // Congela el juego
+        Time.timeScale = 0f;
     }
 
     // void TerminarPartida()
