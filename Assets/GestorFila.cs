@@ -126,7 +126,8 @@ public class GestorFila : MonoBehaviour
         n.MostrarAnimo(true);
 
         tiempoRestante = duracionTurno;
-        while (tiempoRestante > 0f)
+        // Se espera hasta que se acabe el tiempo O el jugador le haya dado todo
+        while (tiempoRestante > 0f && !PedidoCompletado(n))
         {
             tiempoRestante -= Time.deltaTime;
 
@@ -138,11 +139,20 @@ public class GestorFila : MonoBehaviour
         }
         tiempoRestante = 0f;
 
-        // No le han atendido a tiempo: se pierde la mitad de lo que valía el pedido
-        CobrarPenalizacion(n);
+        if (!PedidoCompletado(n))
+        {
+            // No le han atendido a tiempo: se pierde la mitad de lo que valía el pedido
+            // y se va con la cara final
+            CobrarPenalizacion(n);
+            n.AnimoFinal();
+        }
+        else
+        {
+            // Lo ha recibido todo: paga y se va con la cara que tenía en ese momento (no se toca el ánimo)
+            Cobrar(n);
+        }
 
-        // Se acaba el turno: cara final dentro de su bocadillo, se va por la salida y desaparece al llegar
-        n.AnimoFinal();
+        // Se acaba el turno: bocadillo pequeño con el emote, se va por la salida y desaparece al llegar
         n.BocadilloFinal();
         fila.Remove(n);
         n.IrA(salida.position, () => AlSalirNpc(n));
@@ -163,6 +173,12 @@ public class GestorFila : MonoBehaviour
         return fila[0];
     }
 
+    // true si el NPC ya ha recibido todo lo que pedía
+    bool PedidoCompletado(npc n)
+    {
+        return n.pedido != null && n.pedido.Completado();
+    }
+
     // La llama la ZonaEntrega: el jugador da 1 item al NPC que tiene el turno
     public void EntregarItem()
     {
@@ -173,6 +189,14 @@ public class GestorFila : MonoBehaviour
         {
             n.MostrarPedido();   // refresca el bocadillo
         }
+    }
+
+    // El NPC paga el precio total de su pedido
+    void Cobrar(npc n)
+    {
+        if (n.pedido == null || ContadorMonedas.instancia == null) return;
+
+        ContadorMonedas.instancia.Sumar(n.pedido.total);
     }
 
     // Resta de las monedas la mitad del precio total del pedido (redondeando hacia abajo)
