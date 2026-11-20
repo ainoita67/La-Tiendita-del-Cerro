@@ -8,6 +8,7 @@ public class GestorDias : MonoBehaviour
 {
     public int diasTotales = 5;
     public float duracionNoche = 4f;   // segundos que se ve la pantalla de noche
+    public int costeCena = 20;         // lo que cuesta dar de cenar a los gatitos cada noche
 
     [Header("Pantalla de noche")]
     public GameObject pantallaNoche;   // panel oscuro de la UI
@@ -54,6 +55,12 @@ public class GestorDias : MonoBehaviour
 
     IEnumerator Noche()
     {
+        // Se paga la cena de los gatitos antes de enseñar las monedas, para que salgan ya descontadas
+        if (ContadorMonedas.instancia != null)
+        {
+            ContadorMonedas.instancia.Gastar(costeCena);
+        }
+
         // Pantalla de noche con el resumen del día
         if (textoDia != null) textoDia.text = "Termina el dia " + diaActual;
         if (textoMonedas != null && ContadorMonedas.instancia != null)
