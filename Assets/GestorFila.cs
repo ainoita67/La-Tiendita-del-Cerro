@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class GestorFila : MonoBehaviour
 {
+    // Para poder usarlo desde cualquier script: GestorFila.instancia.EmpezarDia();
+    public static GestorFila instancia;
+
+    void Awake()
+    {
+        instancia = this;
+    }
+
     [Header("NPCs")] // Organizacion en el menú de Unity
     public npc prefabNpc;                              
     public AnimatorOverrideController[] personajes;    // los .overrideController de los NPCs
@@ -27,9 +35,15 @@ public class GestorFila : MonoBehaviour
     List<AnimatorOverrideController> disponibles = new List<AnimatorOverrideController>();
     bool turnoEnCurso = false;
 
-    void Start()
+    // Para saber cuándo se acaba el día
+    int npcsEnEscena = 0;          // creados y todavía no destruidos (incluye los que se están yendo)
+    bool creandoFila = false;      // true mientras siguen apareciendo NPCs
+
+    // Lo llama el GestorDias al empezar cada día.
+    public void EmpezarDia()
     {
-        // Copia los personajes y los desordena para sacarlos al azar sin repetir
+        // Cada día se vuelven a barajar todos los personajes
+        disponibles.Clear();
         disponibles.AddRange(personajes);
         Barajar(disponibles);
 
@@ -38,11 +52,26 @@ public class GestorFila : MonoBehaviour
 
     IEnumerator CrearFilaInicial()
     {
+        creandoFila = true;
         int cuantos = Mathf.Min(cantidadInicial, puestos.Length);
         for (int i = 0; i < cuantos; i++)
         {
             if (!AnnadirNpc()) break;
             yield return new WaitForSeconds(esperaEntreApariciones);
+        }
+        creandoFila = false;
+    }
+
+    // Se llama cuando un NPC llega a la salida
+    void AlSalirNpc(npc n)
+    {
+        Destroy(n.gameObject);
+        npcsEnEscena--;
+
+        // Era el último del día: no queda nadie y no van a salir más
+        if (npcsEnEscena == 0 && !creandoFila)
+        {
+            GestorDias.instancia.TerminarDia();
         }
     }
 
@@ -63,9 +92,9 @@ public class GestorFila : MonoBehaviour
 
         // Cada aldeano llega ya sabiendo lo que quiere
         nuevo.pedido = GenerarPedido();
-        Debug.Log(nuevo.name + " quiere " + nuevo.pedido);
 
         fila.Add(nuevo);
+        npcsEnEscena++;
         MandarASuPuesto(nuevo);
         return true;
     }
@@ -97,7 +126,8 @@ public class GestorFila : MonoBehaviour
         n.MostrarAnimo(true);
 
         tiempoRestante = duracionTurno;
-        while (tiempoRestante > 0f)
+        // Se espera hasta que se acabe el tiempo O el jugador le haya dado todo
+        while (tiempoRestante > 0f && !PedidoCompletado(n))
         {
             tiempoRestante -= Time.deltaTime;
 
@@ -109,11 +139,23 @@ public class GestorFila : MonoBehaviour
         }
         tiempoRestante = 0f;
 
-        // Se acaba el turno: cara final dentro de su bocadillo, se va por la salida y desaparece al llegar
-        n.AnimoFinal();
+        if (!PedidoCompletado(n))
+        {
+            // No le han atendido a tiempo: se pierde la mitad de lo que valía el pedido
+            // y se va con la cara final
+            CobrarPenalizacion(n);
+            n.AnimoFinal();
+        }
+        else
+        {
+            // Lo ha recibido todo: paga y se va con la cara que tenía en ese momento (no se toca el ánimo)
+            Cobrar(n);
+        }
+
+        // Se acaba el turno: bocadillo pequeño con el emote, se va por la salida y desaparece al llegar
         n.BocadilloFinal();
         fila.Remove(n);
-        n.IrA(salida.position, () => Destroy(n.gameObject));
+        n.IrA(salida.position, () => AlSalirNpc(n));
 
         turnoEnCurso = false;
 
@@ -124,12 +166,57 @@ public class GestorFila : MonoBehaviour
         }
     }
 
+    // El NPC que está hablando ahora mismo (null si no hay turno en marcha)
+    public npc NpcConTurno()
+    {
+        if (!turnoEnCurso || fila.Count == 0) return null;
+        return fila[0];
+    }
+
+    // true si el NPC ya ha recibido todo lo que pedía
+    bool PedidoCompletado(npc n)
+    {
+        return n.pedido != null && n.pedido.Completado();
+    }
+
+    // La llama la ZonaEntrega: el jugador da 1 item al NPC que tiene el turno
+    public void EntregarItem()
+    {
+        // Con la partida perdida ya no se puede entregar nada
+        // Por si aparece tarde la pantalla para que no te deje corregir rapido y no perder
+        if (GestorDias.instancia != null && GestorDias.instancia.partidaPerdida) return;
+
+        npc n = NpcConTurno();
+        if (n == null || n.pedido == null) return;
+
+        if (n.pedido.RestarItem())
+        {
+            n.MostrarPedido();   // refresca el bocadillo
+        }
+    }
+
+    // El NPC paga el precio total de su pedido
+    void Cobrar(npc n)
+    {
+        if (n.pedido == null || ContadorMonedas.instancia == null) return;
+
+        ContadorMonedas.instancia.Sumar(n.pedido.total);
+    }
+
+    // Resta de las monedas la mitad del precio total del pedido (redondeando hacia abajo)
+    void CobrarPenalizacion(npc n)
+    {
+        if (n.pedido == null || n.pedido.item == null || ContadorMonedas.instancia == null) return;
+
+        int penalizacion = Mathf.FloorToInt(n.pedido.PrecioTotal() / 2f);
+        ContadorMonedas.instancia.Gastar(penalizacion);
+    }
+
     // Elige un item al azar de los posibles y una cantidad al azar dentro de su rango
     Pedido GenerarPedido()
     {
         if (itemsPosibles == null || itemsPosibles.Length == 0)
         {
-            Debug.LogWarning("GestorFila: no hay items en 'Items Posibles', el NPC no tendrá pedido");
             return null;
         }
 
