@@ -49,6 +49,9 @@ public class GestorDias : MonoBehaviour
     void EmpezarDia()
     {
         if (textoDiaHud != null) textoDiaHud.text = "dia " + diaActual;
+
+        // Cada mañana el cofre se rellena
+        if (Inventario.instancia != null) Inventario.instancia.NuevoDia();
         GestorFila.instancia.EmpezarDia();
     }
 
