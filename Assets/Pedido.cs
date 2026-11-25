@@ -8,6 +8,7 @@ public class Pedido
     public int cantidad;   // cuántos quiere este aldeano
     public int cantidadRestante; // total - entregado por el jugador
     public int total;
+    public bool propina = true;   // se pierde si se tarda demasiado en atenderle
 
     public Pedido(Item item, int cantidad)
     {

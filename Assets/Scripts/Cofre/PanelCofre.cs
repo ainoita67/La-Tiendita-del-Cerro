@@ -14,10 +14,10 @@ public class PanelCofre : MonoBehaviour
 
     [Header("Nivel")]
     // Mientras no se decida la regla de subir de nivel: el nivel es el número de día
-    // (día 1 = solo trigo, día 2 = también leche...). Desmárcalo para usar "Nivel Actual" a mano.
+    // (los items con "Necesita Vacas" no miran el nivel). Desmárcalo para usar "Nivel Actual" a mano.
     public bool usarDiaComoNivel = true;
     public int nivelActual = 1;
-    public static bool vacasDesbloqueadas;
+    public static bool vacasDesbloqueadas;   // la pone a true el BotonVacas
 
     [Header("Pruebas")]
     public bool teclaDePrueba = true;  // con E se abre el menú sin necesidad del cofre del mapa
@@ -60,7 +60,6 @@ public class PanelCofre : MonoBehaviour
     {
         int nivel = nivelActual;
         if (usarDiaComoNivel && GestorDias.instancia != null) nivel = GestorDias.instancia.diaActual;
-        if (vacasDesbloqueadas && nivel < 2) nivel = 2;   // con las vacas, la leche ya se puede coger
         return nivel;
     }
 

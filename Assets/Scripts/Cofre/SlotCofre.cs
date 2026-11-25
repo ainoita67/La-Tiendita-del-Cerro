@@ -31,7 +31,10 @@ public class SlotCofre : MonoBehaviour
     // Se llama cada vez que se abre el cofre para refrescar lo que se ve
     public void Refrescar(int nivelActual)
     {
-        Bloqueado = item == null || nivelActual < nivelMinimo;
+        // Los items de las vacas no miran el nivel, solo si se han comprado
+        bool necesitaVacas = item != null && item.necesitaVacas;
+        bool desbloqueado = necesitaVacas ? item.Desbloqueado() : nivelActual >= nivelMinimo;
+        Bloqueado = item == null || !desbloqueado;
 
         Cantidad = 0;
         if (item != null && Inventario.instancia != null)
@@ -41,7 +44,7 @@ public class SlotCofre : MonoBehaviour
 
         Color color = Bloqueado ? colorBloqueado : colorActivo;
 
-        if (textoNivel != null) textoNivel.text = "Nivel " + nivelMinimo;
+        if (textoNivel != null) textoNivel.text = necesitaVacas ? "Vacas" : "Nivel " + nivelMinimo;
         if (textoCantidad != null) textoCantidad.text = Bloqueado ? "" : "x" + Cantidad;
 
         if (textoNombre != null)

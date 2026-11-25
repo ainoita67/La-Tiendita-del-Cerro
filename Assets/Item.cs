@@ -13,4 +13,12 @@ public class Item : ScriptableObject
     public int cantidadMaxima = 5;   // lo máximo
 
     public int precio = 1;           // monedas por unidad (aún no se usa)
+
+    public bool necesitaVacas = false;   // true = solo disponible tras comprar las vacas (ej: leche)
+
+    // ¿Está disponible ahora mismo? Lo consultan los pedidos y el cofre
+    public bool Desbloqueado()
+    {
+        return !necesitaVacas || PanelCofre.vacasDesbloqueadas;
+    }
 }

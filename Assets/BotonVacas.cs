@@ -78,5 +78,6 @@ public class BotonVacas : MonoBehaviour
     void DesbloquearVacas()
     {
         if (vacas != null) vacas.gameObject.SetActive(true);
+        PanelCofre.vacasDesbloqueadas = true;
     }
 }

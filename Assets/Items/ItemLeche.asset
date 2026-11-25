@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: ItemLeche
   m_EditorClassIdentifier: 
   nombre: Leche
-  icono: {fileID: -528724142, guid: 7204a8ccb2bce1c4183f2ffc27562da4, type: 3}
+  icono: {fileID: 774819015, guid: 7204a8ccb2bce1c4183f2ffc27562da4, type: 3}
   cantidadMinima: 1
-  cantidadMaxima: 5
-  precio: 2
+  cantidadMaxima: 3
+  precio: 5
+  necesitaVacas: 1
