@@ -189,9 +189,13 @@ public class GestorFila : MonoBehaviour
         npc n = NpcConTurno();
         if (n == null || n.pedido == null) return;
 
+        // Solo se puede entregar lo que llevas en brazos, y tiene que ser lo que pide el aldeano
+        if (Inventario.instancia == null || Inventario.instancia.llevando != n.pedido.item) return;
+
         if (n.pedido.RestarItem())
         {
-            n.MostrarPedido();   // refresca el bocadillo
+            Inventario.instancia.SoltarLlevado();   // se entrega 1 y los brazos quedan libres
+            n.MostrarPedido();                      // refresca el bocadillo
         }
     }
 
