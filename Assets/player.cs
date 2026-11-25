@@ -24,9 +24,15 @@ public class player : MonoBehaviour
         ActualizarAnim();
     }
 
+    // true mientras el cofre se abre o está abierto: el personaje se queda quieto
+    bool CofreOcupado()
+    {
+        return PanelCofre.instancia != null && PanelCofre.instancia.Bloqueado;
+    }
+
     void LeerPickup()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && !CofreOcupado())
         {
             anim.SetTrigger("pickup");
         }
@@ -35,6 +41,9 @@ public class player : MonoBehaviour
     void LeerMovimiento()
     {
         movimiento = Vector3.zero;
+
+        // Con el cofre abierto no se mueve
+        if (CofreOcupado()) return;
 
         if (Input.GetKey(KeyCode.D))
         {
