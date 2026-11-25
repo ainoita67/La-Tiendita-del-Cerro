@@ -134,6 +134,12 @@ public class GestorFila : MonoBehaviour
             // progreso es un porcentaje a partir del cual actualizar animo calcula el sprite necesario
             float progreso = 1f - tiempoRestante / duracionTurno;
             n.ActualizarAnimo(progreso);
+            if (progreso > 0.6f && n.pedido.propina)
+            {
+                n.pedido.propina = false;
+                n.pedido.total -= 2;
+                n.MostrarPedido();
+            }
 
             yield return null;
         }
@@ -224,7 +230,15 @@ public class GestorFila : MonoBehaviour
             return null;
         }
 
-        Item item = itemsPosibles[Random.Range(0, itemsPosibles.Length)];
+        // Solo se puede pedir lo que ya esté desbloqueado
+        List<Item> desbloqueados = new List<Item>();
+        foreach (Item i in itemsPosibles)
+        {
+            if (i != null && i.Desbloqueado()) desbloqueados.Add(i);
+        }
+        if (desbloqueados.Count == 0) return null;
+
+        Item item = desbloqueados[Random.Range(0, desbloqueados.Count)];
         // Con números enteros, Random.Range NO incluye el máximo, por eso el +1
         int cantidad = Random.Range(item.cantidadMinima, item.cantidadMaxima + 1);
 
