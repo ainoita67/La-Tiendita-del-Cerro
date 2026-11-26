@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class player : MonoBehaviour
 {
-    public float velocidad = 2f;
+    public float velocidad = 4.5f;
 
     Vector3 movimiento;
     Animator anim;
