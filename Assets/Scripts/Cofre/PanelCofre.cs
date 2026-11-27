@@ -19,9 +19,6 @@ public class PanelCofre : MonoBehaviour
     public int nivelActual = 1;
     public static bool vacasDesbloqueadas;   // la pone a true el BotonVacas
 
-    [Header("Pruebas")]
-    public bool teclaDePrueba = true;  // con E se abre el menú sin necesidad del cofre del mapa
-
     // true desde que el cofre empieza a abrirse hasta que se cierra el menú:
     // durante ese tiempo el personaje se queda quieto
     public bool Bloqueado { get; set; }
@@ -30,7 +27,7 @@ public class PanelCofre : MonoBehaviour
 
     // 0..slots.Length-1 = casillas, slots.Length = botón Salir
     int seleccion;
-    Cofre cofreActual;   // el cofre del mapa que ha abierto el menú (null si es con la tecla de prueba)
+    Cofre cofreActual;   // el cofre del mapa que ha abierto el menú (null mientras está cerrado)
 
     void Awake()
     {
@@ -45,11 +42,7 @@ public class PanelCofre : MonoBehaviour
 
     void Update()
     {
-        if (!Abierto)
-        {
-            if (teclaDePrueba && !Bloqueado && Input.GetKeyDown(KeyCode.E)) Abrir(null);
-            return;
-        }
+        if (!Abierto) return;   // el menú solo se abre desde el cofre del mapa
 
         Mover();
 

@@ -11,6 +11,7 @@ public class GestorDias : MonoBehaviour
     public int costeCena = 20;         // lo que cuesta dar de cenar a los gatitos cada noche
 
     [Header("Pantalla de noche")]
+    public GameObject tutorial;
     public GameObject pantallaNoche;   // panel oscuro de la UI
     public TMP_Text textoDia;          // "Fin del día 1"
     public TMP_Text textoMonedas;      // "Monedas: 20"
@@ -34,7 +35,7 @@ public class GestorDias : MonoBehaviour
         instancia = this;
     }
 
-    void Start()
+    IEnumerator Start()
     {
         Time.timeScale = 1f;   // por si venía bloqueado de antes
         if (pantallaNoche != null) pantallaNoche.SetActive(false);
@@ -43,6 +44,7 @@ public class GestorDias : MonoBehaviour
 
         partidaPerdida = false;
         diaActual = 1;
+        yield return StartCoroutine(MostrarTutorial());
         EmpezarDia();
     }
 
@@ -120,5 +122,12 @@ public class GestorDias : MonoBehaviour
     //     // Congela el juego: todo lo que usa el tiempo (movimiento, animaciones...) se para
     //     Time.timeScale = 0f;
     // }
+
+    IEnumerator MostrarTutorial(){
+        if (tutorial != null) tutorial.SetActive(true);
+        yield return new WaitForSeconds(10f);
+        if (tutorial != null) tutorial.SetActive(false);
+
+    }
 
 }

@@ -173,7 +173,7 @@ public static class CrearCofre
             "1) Arrastra el objeto 'Cofre' dentro de la casita.\n" +
             "2) Ajusta el Box Collider 2D del cofre para que no llegue a la puerta ni a las paredes.\n" +
             "3) Guarda la escena (Ctrl+S).\n" +
-            "4) Prueba con Play (con E se abre el menú sin cofre)." + avisoJugador,
+            "4) Prueba con Play acercándote al cofre." + avisoJugador,
             "Vale");
     }
 
